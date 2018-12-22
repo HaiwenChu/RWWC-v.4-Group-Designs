@@ -7,21 +7,43 @@ optimistic<-c(10,10.1,10.2,10.3,10.4,10.5,10.7,10.8,10.9,10.9,10.9,10.9,10.9,10.
 # "attrit" (Attrition Calculator)
 # given number of participants and original groups for intervention and comparison groups
 # returns overall and differential attrition
+#' Calculates overall and differential attrition
+#'
+#' @param ai Intervention analytic
+#' @param ni Intervention total
+#' @param ac Comparison analytic
+#' @param nc Comparison total
+#' @return Overall and differential attrition of \code(pi) surviving out of \code(ni) and \code(pc) out of \code(nc)
+#' @examples
+#' attrit(20,40,31,49) yields overall attrition of 43% and differential 13%
+#' attrit(30,40,40,48) yields overall attrition of 20% and differential 8%
+#' attrit(10,20,100,200) yields overall attrition of 50% and differential 0%
 
-attrit<-function(pi,ni,pc,nc){
-  ai<-(ni-pi)/ni
-  ac<-(nc-pc)/nc
-  at<-(ni+nc-pi-pc)/(ni+nc)
-  ad<-abs(ai-ac)
+attrit<-function(ai,ni,ac,nc){
+  ati<-(ni-ai)/ni
+  atc<-(nc-ac)/nc
+  at<-(ni+nc-ai-ac)/(ni+nc)
+  ad<-abs(ati-atc)
   return(c(at,ad))
 }
 
 # "attritest" (Attrition Tester: Low or No?)
 # given number of participants and original groups for intervention and comparison
 # returns whether overall and differential attrition within the cautious and optimistic bounds
+#' Tests whetheroverall and differential attrition meets cautious and optimistic bounds
+#'
+#' @param ai Intervention analytic
+#' @param ni Intervention total
+#' @param ac Comparison analytic
+#' @param nc Comparison total
+#' @return Boolean values for passing cautious and optimistic boundaries
+#' @examples
+#' attritest(20,40,31,49) yields high attrition
+#' attritest(30,40,40,48) yield low attrition optimistically and high attrition cautiously
+#' attritest(10,20,100,200) yields low attrition under both boundaries
 
-attritest<-function(pi,ni,pc,nc){
-  oda<-attrit(pi,ni,pc,nc)
+attritest<-function(ai,ni,ac,nc){
+  oda<-attrit(ai,ni,ac,nc)
   oa<-floor(oda[1]*100)
   da<-oda[2]*100
   return(c(da<cautious[oa],da<optimistic[oa]))
@@ -30,12 +52,23 @@ attritest<-function(pi,ni,pc,nc){
 # "attritplot" (Attrition Plotter)
 # given number of participants and original groups for intervention and comparison groups
 # plots overall and differential attrition relative to optimistic and cautious boundaries.
+#' Plots overall and differential attrition inside cautious and optimistic regions
+#'
+#' @param ai Intervention analytic
+#' @param ni Intervention total
+#' @param ac Comparison analytic
+#' @param nc Comparison total
+#' @return Plots overall and differential attrition within cautious and optimistic bounds
+#' @examples
+#' attritplot(20,40,31,49) lands in high attrition
+#' attritplot(30,40,40,48) lands in low attrition optimistically and high attrition cautiously
+#' attritest(10,20,100,200) lands in low attrition under both boundaries
 
-attritplot<-function(pi,ni,pc,nc){
-  attr<-attrit(pi,ni,pc,nc)
+attritplot<-function(ai,ni,ac,nc){
+  attr<-attrit(ai,ni,ac,nc)
   plot(overall,optimistic,"l",ylab="differential",ylim=c(0,max(c(12,attr[2]*100))))
   points(overall,cautious,"l")
-  attr<-attrit(pi,ni,pc,nc)
+  attr<-attrit(ai,ni,ac,nc)
   points(attr[1]*100,attr[2]*100,pch=4)
   return(attr)
 }
