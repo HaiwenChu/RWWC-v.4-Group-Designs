@@ -1,7 +1,12 @@
-
+# Constants from WWC Standards Handbook v4.0, Table II.1 (p.12)
+# Boundaries for differential attrition (cautious and optimistic)
 overall<-0:57
 cautious<-c(5.7,5.8,5.9,5.9,6,6.1,6.2,6.3,6.3,6.3,6.3,6.2,6.2,6.1,6,5.9,5.9,5.8,5.7,5.5,5.4,5.3,5.2,5.1,4.9,4.8,4.7,4.5,4.4,4.3,4.1,4,3.8,3.6,3.5,3.3,3.2,3.1,2.9,2.8,2.6,2.5,2.3,2.1,2,1.8,1.6,1.5,1.3,1.2,1,.9,.7,.6,.4,.3,.2,0)
 optimistic<-c(10,10.1,10.2,10.3,10.4,10.5,10.7,10.8,10.9,10.9,10.9,10.9,10.9,10.9,10.8,10.8,10.7,10.6,10.5,10.3,10.2,10,9.9,9.7,9.5,9.4,9.2,9,8.8,8.6,8.4,8.2,8,7.8,7.6,7.4,7.2,7,6.7,6.5,6.3,6,5.8,5.6,5.3,5.1,4.9,4.6,4.4,4.2,3.9,3.7,3.5,3.2,3,2.8,2.6,2.3)
+
+# "attrit" (Attrition Calculator)
+# given number of participants and original groups for intervention and comparison groups
+# returns overall and differential attrition
 
 attrit<-function(pi,ni,pc,nc){
   ai<-(ni-pi)/ni
@@ -11,13 +16,9 @@ attrit<-function(pi,ni,pc,nc){
   return(c(at,ad))
 }
 
-attritplot<-function(pi,ni,pc,nc){
-  plot(overall,optimistic,"l",ylab="differential",ylim=c(0,11))
-  points(overall,cautious,"l")
-  attr<-attrit(pi,ni,pc,nc)
-  points(attr*100,pch=4)
-  return(attr)
-}
+# "attritest" (Attrition Tester: Low or No?)
+# given number of participants and original groups for intervention and comparison
+# returns whether overall and differential attrition within the cautious and optimistic bounds
 
 attritest<-function(pi,ni,pc,nc){
   oda<-attrit(pi,ni,pc,nc)
@@ -26,15 +27,73 @@ attritest<-function(pi,ni,pc,nc){
   return(c(da<cautious[oa],da<optimistic[oa]))
 }
 
-diffprop<-function(pi,ni,pc,nc){
-  psd<-sqrt(((ni-1)*pi*(ni-pi)/ni^3+(nc-1)*pc*(nc-pc)/nc^3)/(ni+nc-2))
-  z<-(pi/ni-pc/nc)/psd
-  return(z)
+# "attritplot" (Attrition Plotter)
+# given number of participants and original groups for intervention and comparison groups
+# plots overall and differential attrition relative to optimistic and cautious boundaries.
+
+attritplot<-function(pi,ni,pc,nc){
+  attr<-attrit(pi,ni,pc,nc)
+  plot(overall,optimistic,"l",ylab="differential",ylim=c(0,max(c(12,attr[2]*100))))
+  points(overall,cautious,"l")
+  attr<-attrit(pi,ni,pc,nc)
+  points(attr[1]*100,attr[2]*100,pch=4)
+  return(attr)
 }
+
+# "BH" (Benjamini-Hochberg correction for multiple comparisons)
+# given a vector of p-values and the significance level
+# returns a list of p-values still significant after Benjamini-Hochberg correction
 
 BH<-function(pvals,alpha){
   pvals<-sort(pvals)
   n<-length(pvals)
-  scalep<-1:n/n*alpha
+  scalep<-1:n / n * alpha
   return(pvals[1:max(1:n*as.numeric(pvals<scalep))])
 }
+
+# "poolsd" (Pools standard deviations)
+# given two standard deviations with sample sizes
+# returns pooled standard deviations weighted by sample sizes
+
+poolsd<-function(sd1,n1,sd2,n2){
+  psd<-sqrt(((n1 - 1) * sd1^2+(n2 - 1) * sd2^2)/( n1 + n2 -2 ))
+  return(psd)
+}
+
+# "omg" (Hedges' omega)
+# given N the total sample size
+# returns Hedges' small-sample correction factor, omega
+
+omg<-function(N){
+  return(1 - 3 / (4 * N - 9))
+}
+
+# "Hedg" (Hedges' g)
+# given two group means, standard deviations, sample sizes, and a small-sample flag
+# returns Hedges' g
+
+Hedg<-function(yi,yc,si,sc,ni,nc,small){
+  if (small==TRUE) omega<-omg(ni + nc) else
+    omega<-1
+  g<-omega * (yi - yc) / poolsd(si,ni,sc,nc)
+  return(g)
+}
+
+# "sdprop" (Standard deviation of sampling proportion)
+# given number successful and total
+# returns standard deviation of sampling proportion
+
+sdprop<-function(p,n){
+  return(sqrt(p *(n - p) / n^3))
+}
+
+# "diffprop" (Difference in proprtions)
+# given successes and total in intervention and comparison respectively
+# returns effect size of difference (computed as Hedges' g)
+
+diffprop<-function(pi,ni,pc,nc){
+  psd<-Hedg(pi/ni,pc/nc,sdprop(pi,ni),sdprop(pc,nc),ni,nc,TRUE)
+  z<-(pi/ni-pc/nc)/psd
+  return(z)
+}
+
