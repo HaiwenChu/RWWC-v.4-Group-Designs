@@ -6,6 +6,8 @@ This package is meant to be a calculator to facilitate applying the What Works C
 Topics covered include:
 1) Attrition, overall & differential
 2) Assessing attrition, cautious & optimistic boundaries
+3) Multiple comparisons
+4) Hedge's g
 
 Functions include:
 1) attrit: returns overall and differential attrition
