@@ -13,7 +13,7 @@ optimistic<-c(10,10.1,10.2,10.3,10.4,10.5,10.7,10.8,10.9,10.9,10.9,10.9,10.9,10.
 #' @param ni Intervention total
 #' @param ac Comparison analytic
 #' @param nc Comparison total
-#' @return Overall and differential attrition of \code(pi) surviving out of \code(ni) and \code(pc) out of \code(nc)
+#' @return Overall and differential attrition of \code{ai} surviving out of \code{ni} and \code{ac} out of \code{nc}
 #' @examples
 #' attrit(20,40,31,49) yields overall attrition of 43% and differential 13%
 #' attrit(30,40,40,48) yields overall attrition of 20% and differential 8%
@@ -88,31 +88,80 @@ BH<-function(pvals,alpha){
   pvals<-sort(pvals)
   n<-length(pvals)
   scalep<-1:n / n * alpha
-  return(pvals[1:max(1:n*as.numeric(pvals<scalep))])
+  return(pvals[0:max(1:n*as.numeric(pvals<scalep))])
 }
 
 # "poolsd" (Pools standard deviations)
 # given two standard deviations with sample sizes
 # returns pooled standard deviations weighted by sample sizes
+#' Pools standard deviations
+#'
+#' @param sd1 First standard deviation
+#' @param n1 First sample size
+#' @param sd2 Second standard deviation
+#' @param n2 Second sample size
+#' @return Pooled standard deviation
+#' @examples
+#' poolsd(0.5,100,0.4,40)
+#' poolsd(0.07,10,0.05,30)
+
 
 poolsd<-function(sd1,n1,sd2,n2){
   psd<-sqrt(((n1 - 1) * sd1^2+(n2 - 1) * sd2^2)/( n1 + n2 -2 ))
   return(psd)
 }
 
+
 # "omg" (Hedges' omega)
 # given N the total sample size
 # returns Hedges' small-sample correction factor, omega
+#' Hedges' small-samplre correction factor
+#'
+#' @param N total sample size
+#' @return Hedges' omega
+#' @examples
+#' omg(10)
+#' omg(100)
 
 omg<-function(N){
   return(1 - 3 / (4 * N - 9))
 }
 
+# "Cox" (Cox Index)
+# given two proportions and sample sizes
+# returns Cox index with small-sample correction factor
+#' Cox index for effect size comparing two dichotomous outcomes
+#'
+#' @param pi Intervention proportion
+#' @param pc Comparison proportion
+#' @param ni Intervention sample size
+#' @param nc Comparison sample size
+#' @return Cox index
+#' @examples
+#' Cox(20/40,40,31/49,49)
+
+Cox<-function(pi,pc,ni,nc){
+  return(omg(ni + nc)*((log(pi / (1 - pi)) - log(pc / (1 - pc))) / 1.65))
+}
+
 # "Hedg" (Hedges' g)
 # given two group means, standard deviations, sample sizes, and a small-sample flag
 # returns Hedges' g
+#' Hedges' g for effect size of continuous outcomes
+#'
+#' @param yi Intervention mean
+#' @param yc Comparison mean
+#' @param si Intervention standard deviation
+#' @param sc Comparison standard deviation
+#' @param ni Intervention sample size
+#' @param nc Comparison sample size
+#' @param small Flag for applying omega small-sample correction (defaults to TRUE)
+#' @return Hedges' g
+#' @examples
+#' Hedg(3,5,1,2,10,100)
+#' Hedg(3,5,1,2,10,100,FALSE)
 
-Hedg<-function(yi,yc,si,sc,ni,nc,small){
+Hedg<-function(yi,yc,si,sc,ni,nc,small=TRUE){
   if (small==TRUE) omega<-omg(ni + nc) else
     omega<-1
   g<-omega * (yi - yc) / poolsd(si,ni,sc,nc)
@@ -132,8 +181,96 @@ sdprop<-function(p,n){
 # returns effect size of difference (computed as Hedges' g)
 
 diffprop<-function(pi,ni,pc,nc){
-  psd<-Hedg(pi/ni,pc/nc,sdprop(pi,ni),sdprop(pc,nc),ni,nc,TRUE)
-  z<-(pi/ni-pc/nc)/psd
-  return(z)
+  g<-Hedg(pi/ni,pc/nc,sdprop(pi,ni),sdprop(pc,nc),ni,nc,TRUE)
+  return(g)
 }
 
+# "DND" (Difference in Differences)
+# given pretest means, sds, and n for intervention and comparison
+# given posttest means, sds, and n for intervention and comparison
+# returns pre- and post-effect sizes and difference in differences using Hedg
+#' Difference in differences
+#'
+#' @param premi Pre-test Intervention mean
+#' @param presdi Pre-test Intervention standard devition
+#' @param preni Pre-test Intervention sample size
+#' @param premc Pre-test Comparison mean
+#' @param presdc Pre-test Comparison standard devition
+#' @param prenc Pre-test Comparison sample size
+#' @param postmi Post-test Intervention mean
+#' @param postdi Post-test Intervention standard devition
+#' @param postni Post-test Intervention sample size
+#' @param postmc Post-test Comparison mean
+#' @param postsdc Post-test Comparison standard devition
+#' @param postnc Post-test Comparison sample size
+#' @return Differences in differences adjustment
+#'
+DND<-function(premi,presdi,preni,premc,presdc,prenc,
+              postmi,postsdi,postni,postmc,postsdc,postnc){
+  prez<-Hedg(premi,premc,presdi,presdc,preni,prenc,TRUE)
+  postz<-Hedg(postmi,postmc,postsdi,postsdc,postni,postnc,TRUE)
+  return(c(prez,postz,postz - prez))
+}
+
+
+# "gfromt" (Hedges' g from t-score)
+#' Hedges' g from t-statistic
+#'
+#' @param t t-Statistic
+#' @param ni Intervention sample size
+#' @param nc Comparison sample size
+#' @return Hedges' g
+
+gfromt<-function(t,ni,nc){
+  return(t* sqrt( (ni+nc) / (ni*nc) ) / sqrt (1 - t^2/2/(ni++nc)))
+}
+
+# "tfromg" (t-statistic from Hedges' g)
+#' t-statistic from Hedges' g
+#'
+#' @param g Hedges' g
+#' @param ni Intervention sample size
+#' @param nc Comparison sample size
+#' @return t-statistic
+tfromg<-function(g,ni,nc){
+  return(g/sqrt( (ni + nc) / (ni * nc) + g^2/ 2 /(ni + nc)))
+}
+
+
+# "declust" (Clustering adjustment factor)
+#' Adjustment factor for t-statistic
+#'
+#' @param rho Intraclass correlation coefficient
+#' @param N total sample size
+#' @param M number of clusters
+#' @return correction factor for t-statistic
+declust<-function(rho,N,M){
+  return(sqrt( ((N-2)-2 * (N/M - 1) * rho)/( (N-2) * (1 + (N / M - 1)* rho) )))
+}
+
+# "degclust" (Degrees of freedom for clustering adjustment)
+#' Adjusted degrees of freedom for clustering correction
+#'
+#' @param rho Intraclass correlation coefficient
+#' @param N total sample size
+#' @param M number of clusters
+#' @return degrees of freedom
+degclust<-function(rho,N,M){
+  return( ( (N - 2) - 2* ( N / M - 1 ) *rho )^2 /
+            ( (N-2) * (1-rho)^2+ N / M *(N-2*N/M)* rho^2+2 * (N-2*N/M)*rho*(1-rho)) )
+}
+
+
+# "decluster" (Adjusts g for clustering)
+#' Clustering correction for effect size
+#'
+#' @param g Hedges' g
+#' @param rho Intraclass correlation coefficient
+#' @param ni Intevention sample size
+#' @param nc Comparison cluster size
+#' @param M number of clusters
+#' @return p-value
+decluster<-function(g,rho,ni,nc,m){
+  t<-tfromg(g,ni,nc)
+  return(2*(1-pt(t*declust(rho,ni+nc,m),degclust(rho,ni+nc,m))))
+}
