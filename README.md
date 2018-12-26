@@ -10,11 +10,11 @@ Topics covered include:
 4) Clustering correction
 
 Functions include:
-1a) attrit: returns overall and differential attrition
-1b) attritplot: plots overall and differential attrition on Figure II.2 (of Standards handbook)
-1c) attritest: returns whether attrition is within cautious and optimistic bounds
-2) BH: Benjamini-Hochberg correction for multiple comparisons
-3a) Cox: Cox index
-3b) Hedg: Hedges' g
-3c) DND: Difference in differences
-4) decluster: Performs clustering correction using intraclass correlation coefficient
+* attrit: returns overall and differential attrition
+* attritplot: plots overall and differential attrition on Figure II.2 (of Standards handbook)
+* attritest: returns whether attrition is within cautious and optimistic bounds
+* BH: Benjamini-Hochberg correction for multiple comparisons
+* Cox: Cox index
+* Hedg: Hedges' g
+* DND: Difference in differences
+* decluster: Performs clustering correction using intraclass correlation coefficient
