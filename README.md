@@ -1,7 +1,7 @@
 # WWCr
 R package for reviewing group designs in the new v4.0 WWC Procedures and Standards Handbooks
 
-This package is meant to be a calculator to facilitate applying the What Works Clearinghouse Standards Handbook (version 4.0) and Procedures Hanbook (version 4.0)
+This package is a calculator to facilitate applying the What Works Clearinghouse Standards Handbook (version 4.0) and Procedures Hanbook (version 4.0)
 
 Topics covered include:
 1) Attrition: overall & differential, cautious & optimistic 
@@ -12,7 +12,7 @@ Topics covered include:
 Functions include:
 1a) attrit: returns overall and differential attrition
 1b) attritplot: plots overall and differential attrition on Figure II.2 (of Standards handbook)
-1c) attritest: returns whethera attrition is within cautious and optimistic bounds are met
+1c) attritest: returns whether attrition is within cautious and optimistic bounds
 2) BH: Benjamini-Hochberg correction for multiple comparisons
 3a) Cox: Cox index
 3b) Hedg: Hedges' g
