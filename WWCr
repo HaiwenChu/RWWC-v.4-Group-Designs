@@ -49,27 +49,19 @@ attritest<-function(ai,ni,ac,nc){
   return(c(da<cautious[oa],da<optimistic[oa]))
 }
 
-# "attritplot" (Attrition Plotter)
-# given number of participants and original groups for intervention and comparison groups
-# plots overall and differential attrition relative to optimistic and cautious boundaries.
-#' Plots overall and differential attrition inside cautious and optimistic regions
-#'
-#' @param ai Intervention analytic
-#' @param ni Intervention total
-#' @param ac Comparison analytic
-#' @param nc Comparison total
-#' @return Plots overall and differential attrition within cautious and optimistic bounds
-#' @examples
-#' attritplot(20,40,31,49) lands in high attrition
-#' attritplot(30,40,40,48) lands in low attrition optimistically and high attrition cautiously
-#' attritest(10,20,100,200) lands in low attrition under both boundaries
-
 attritplot<-function(ai,ni,ac,nc){
   attr<-attrit(ai,ni,ac,nc)
-  plot(overall,optimistic,"l",ylab="differential",ylim=c(0,max(c(12,attr[2]*100))))
-  points(overall,cautious,"l")
-  attr<-attrit(ai,ni,ac,nc)
-  points(attr[1]*100,attr[2]*100,pch=4)
+  ymax<-max(c(12,attr[2]*100))
+  plot(overall,optimistic,"l",ylab="differential",ylim=c(0,ymax),col="red")
+  polygon(c(0:57, rev(0:57)), c(cautious, rep(0,58)),
+          col = "green", border = NA)
+  polygon(c(0:57, rev(0:57)), c(cautious, rev(optimistic)),
+          col = "yellow", border = NA)
+  polygon(c(0:57, rev(0:57)), c(optimistic, rep(ymax,58)),
+          col = "red", border = NA)
+  points(overall,cautious,"l",col="yellow")
+  points(overall,optimistic,"l",col="red")
+  points(attr[1]*100,attr[2]*100,pch=4,lwd=2)
   return(attr)
 }
 
