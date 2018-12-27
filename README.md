@@ -1,7 +1,7 @@
 # WWCr
 R package for reviewing group designs in the new v4.0 WWC Procedures and Standards Handbooks
 
-This package is a calculator to facilitate applying the What Works Clearinghouse Standards Handbook (version 4.0) and Procedures Hanbook (version 4.0)
+This package is a calculator to facilitate applying the What Works Clearinghouse Standards Handbook (version 4.0) and Procedures Handbook (version 4.0)
 
 This version is 0.5, a development version.
 
