@@ -16,6 +16,7 @@ Functions include:
 * attritplot: plots overall and differential attrition on Figure II.2 (of Standards handbook)
 * attritest: returns whether attrition is within cautious and optimistic bounds
 * BH: Benjamini-Hochberg correction for multiple comparisons
+* BHg: Graphical visualization of Benjamini-Hochberg
 * Cox: Cox index
 * Hedg: Hedges' g
 * DND: Difference in differences
