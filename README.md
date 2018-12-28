@@ -3,7 +3,7 @@ R package for reviewing group designs in the new v4.0 WWC Procedures and Standar
 
 This package is a calculator to facilitate applying the What Works Clearinghouse Standards Handbook (version 4.0) and Procedures Handbook (version 4.0)
 
-This version is 0.5, a development version.
+This version is 0.6, a development version.
 
 Topics covered include:
 1) Attrition: overall & differential, cautious & optimistic 
