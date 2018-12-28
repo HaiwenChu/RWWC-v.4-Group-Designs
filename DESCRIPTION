@@ -1,0 +1,13 @@
+Package: WWCr
+Type: Package
+Title: Tools for What Works Clearinghouse Standards and Procedures Handbooks v4.0
+Version: 0.1.0
+Authors@R: person("Haiwen","Chu",email="achu@wested.org",role=c("aut","cre"))
+Description: These functions assist in conducting WWC reviews across topics such as:
+    1) attrition (overall and differential; cautious and optimistic bounds), 
+    2) multiple comparisons (Benjamini-Hochberg corretion), and
+    3) reporting effect sizes (Hedges' g)
+License: MIT
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1
