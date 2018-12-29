@@ -5,19 +5,8 @@ cautious<-c(5.7,5.8,5.9,5.9,6,6.1,6.2,6.3,6.3,6.3,6.3,6.2,6.2,6.1,6,5.9,5.9,5.8,
 optimistic<-c(10,10.1,10.2,10.3,10.4,10.5,10.7,10.8,10.9,10.9,10.9,10.9,10.9,10.9,10.8,10.8,10.7,10.6,10.5,10.3,10.2,10,9.9,9.7,9.5,9.4,9.2,9,8.8,8.6,8.4,8.2,8,7.8,7.6,7.4,7.2,7,6.7,6.5,6.3,6,5.8,5.6,5.3,5.1,4.9,4.6,4.4,4.2,3.9,3.7,3.5,3.2,3,2.8,2.6,2.3)
 
 # "attrit" (Attrition Calculator)
-# given number of participants and original groups for intervention and comparison groups
+# given sizes for analytic and sample for intervention and comparison
 # returns overall and differential attrition
-#' Calculates overall and differential attrition
-#'
-#' @param ai Intervention analytic
-#' @param ni Intervention total
-#' @param ac Comparison analytic
-#' @param nc Comparison total
-#' @return Overall and differential attrition of \code{ai} surviving out of \code{ni} and \code{ac} out of \code{nc}
-#' @examples
-#' attrit(20,40,31,49) yields overall attrition of 43% and differential 13%
-#' attrit(30,40,40,48) yields overall attrition of 20% and differential 8%
-#' attrit(10,20,100,200) yields overall attrition of 50% and differential 0%
 
 attrit<-function(ai,ni,ac,nc){
   ati<-(ni-ai)/ni
@@ -28,19 +17,8 @@ attrit<-function(ai,ni,ac,nc){
 }
 
 # "attritest" (Attrition Tester: Low or No?)
-# given number of participants and original groups for intervention and comparison
+# given sizes for analytic and sample for intervention and comparison
 # returns whether overall and differential attrition within the cautious and optimistic bounds
-#' Tests whetheroverall and differential attrition meets cautious and optimistic bounds
-#'
-#' @param ai Intervention analytic
-#' @param ni Intervention total
-#' @param ac Comparison analytic
-#' @param nc Comparison total
-#' @return Boolean values for passing cautious and optimistic boundaries
-#' @examples
-#' attritest(20,40,31,49) yields high attrition
-#' attritest(30,40,40,48) yield low attrition optimistically and high attrition cautiously
-#' attritest(10,20,100,200) yields low attrition under both boundaries
 
 attritest<-function(ai,ni,ac,nc){
   oda<-attrit(ai,ni,ac,nc)
@@ -48,6 +26,10 @@ attritest<-function(ai,ni,ac,nc){
   da<-oda[2]*100
   return(c(da<cautious[oa],da<optimistic[oa]))
 }
+
+# "attritplot" (Attrition Plotter)
+# given sizes for analytic and sample for intervention and comparison
+# plots overall and differential attrition relative to optimistic and cautious boundaries.
 
 attritplot<-function(ai,ni,ac,nc){
   attr<-attrit(ai,ni,ac,nc)
@@ -68,14 +50,6 @@ attritplot<-function(ai,ni,ac,nc){
 # "BH" (Benjamini-Hochberg correction for multiple comparisons)
 # given a vector of p-values and the significance level
 # returns a list of p-values still significant after Benjamini-Hochberg correction
-#' Applies Benjamini-Hochberg correction for multiple comparisons
-#'
-#' @param pvals Vector of p-values
-#' @param alpha Significance level
-#' @return P-values still significant after Benjamini-Hochberg
-#' @examples
-#' BH(c(0.4,0.2,0.3),0.5) returns all three p-values
-#' BH(c(0.05,0.038,.044,.031,.025,0.006,.013,.019),0.05) returns five significant p-values (0.006, 0.013, 0.019, 0.025, and 0.038)
 BH<-function(pvals,alpha){
   pvals<-sort(pvals)
   n<-length(pvals)
@@ -87,14 +61,7 @@ BH<-function(pvals,alpha){
 # given a vector of p-values and the significance level
 # output a graph of ordered p-values and new critical cut-offs
 # returns a list of p-values still significant after Benjamini-Hochberg correction
-#' Applies Benjamini-Hochberg correction for multiple comparisons
-#'
-#' @param pvals Vector of p-values
-#' @param alpha Significance level
-#' @return P-values still significant after Benjamini-Hochberg (plotted as green X's in the valid grey region)
-#' @examples
-#' BHg(c(0.4,0.2,0.3),0.5) returns all three p-values
-#' BHg(c(0.05,0.038,.044,.031,.025,0.006,.013,.019),0.05) returns five significant p-values (0.006, 0.013, 0.019, 0.025, and 0.038)
+
 BHg<-function(pvals,alpha){
   pvals<-sort(pvals)
   n<-length(pvals)
@@ -106,7 +73,6 @@ BHg<-function(pvals,alpha){
   abline(0,alpha/n)
   return(pvals[0:maxv])
 }
-
 
 # "poolsd" (Pools standard deviations)
 # given two standard deviations with sample sizes
