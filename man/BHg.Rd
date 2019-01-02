@@ -19,6 +19,6 @@ Applies Benjamini-Hochberg correction for multiple comparisons and plots p-value
 
 }
 \examples{
-BH(c(0.4,0.2,0.3),0.5) returns all three p-values
-BH(c(0.05,0.038,.044,.031,.025,0.006,.013,.019),0.05) returns five significant p-values (0.006, 0.013, 0.019, 0.025, and 0.038)
+BHg(c(0.4,0.2,0.3),0.5) returns all three p-values
+BHg(c(0.05,0.038,.044,.031,.025,0.006,.013,.019),0.05) returns five significant p-values (0.006, 0.013, 0.019, 0.025, and 0.038)
 }
